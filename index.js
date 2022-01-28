@@ -9,11 +9,11 @@ const prisma = new PrismaClient()
 
 async function main() {
     console.log("Hello, world!")
-    let startBlock = 14091380
+    let startBlock = 14061480
     let endBlock = 14091480  
         for(var i = startBlock; i <= endBlock; i++){
             web3.eth.getBlock(i).then(res => {
-                prisma.block.create({data: res}).then(resp => console.log(resp)).catch(errr => console.log(errr))
+                prisma.block.create({data: res}).then(resp => console.log(resp.number)).catch(errr => console.log(errr))
             }).catch(err => console.log(err))
         }
 
