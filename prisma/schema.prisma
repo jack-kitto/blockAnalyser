@@ -42,16 +42,21 @@ model Transaction {
   hash String @id
   nonce Int
   // block Block @relation("transactions", fields: [blockHash], references: [hash])
-  blockHash String @unique
+  blockHash String 
   blockNumber Int?  
   transactionIndex Int?
-  from String @unique
+  from String 
   to String?
   value String
   gasPrice String
   gas Int
   input String
-  chainId Int
+  maxFeePerGas String?
+  maxPriorityFeePerGas String?
+  r String
+  s String
+  v String
+  chainId String?
 }
 
 model Account {
