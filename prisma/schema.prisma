@@ -8,35 +8,40 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // url      = "file:./dev.db"
 }
 
 model Block {
-  number Int @id 
+  id Int @id @default(autoincrement()) 
+  number Int  
   hash String @unique
+  mixHash String
   parentHash String @unique
-  baseFeePerGas Int 
+  baseFeePerGas Int?
   nonce String?
   sha3Uncles String
   logsBloom String
   transactionsRoot String
   stateRoot String
-  miner String @unique
+  miner String
   difficulty String
   totalDifficulty String
   extraData String
   size Int
   gasLimit Int
+  receiptsRoot String
   gasUsed Int
   timestamp Int
-  transactions Transaction[] @relation("transactions")
+  transactions String[] 
+  // transactions Transaction[] @relation("transactions")
   uncles String[]
-  chainId Int
+  // chainId Int
 }
 
 model Transaction {
   hash String @id
   nonce Int
-  block Block @relation("transactions", fields: [blockHash], references: [hash])
+  // block Block @relation("transactions", fields: [blockHash], references: [hash])
   blockHash String @unique
   blockNumber Int?  
   transactionIndex Int?
