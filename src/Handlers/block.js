@@ -1,10 +1,10 @@
 const Web3 = require('web3');
-const web3 = new Web3("https://mainnet.infura.io/v3/b0e7735dd085494f9eb0002130929191");
+const web3 = new Web3("https://mainnet.infura.io/v3/78f30f1fb097453faabae08e3fa064a0");
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient()
 
 function createRange(req, res){
-    console.log(req.body.ping);
+    // console.log(req.body.ping);
     res.json(req.body);
 
     for(var i = req.body.start; i <= req.body.end; i++){
@@ -18,7 +18,7 @@ function createRange(req, res){
 function loadTransactions(transactions){
 
     for(var i = 0; i <= transactions.length -1; i++){
-        console.log(transactions[i])
+        // console.log(transactions[i])
         web3.eth.getTransaction(transactions[i]).then(res => {
             let txn = {
                 hash: res.hash,
@@ -39,7 +39,9 @@ function loadTransactions(transactions){
                 v: res.v,
                 chainId: res.chainId
             }
-            prisma.transaction.create({data: txn}).then(resp => console.log(resp)).catch(errr => console.log(errr))
+            loadAccounts(txn.from);
+            loadAccounts(txn.to);
+            prisma.transaction.create({data: txn}).then().catch(errr => console.log(errr))
         }).catch(err => console.log(err))
 
         // console.log("###########################################################")
@@ -51,8 +53,69 @@ function loadTransactions(transactions){
     console.log("###########################################################")
 }
 
+async function loadAccounts(address_){
+    // console.log("###########################################################")
+    // console.log("NEW ADDRESS")
+    // console.log("###########################################################")
+
+    var index = 9;
+    // console.log("Address: ", address_);
+    var store; 
+
+    let account = {
+        address: address_,
+        balance: await web3.eth.getBalance(address_),
+        code: await web3.eth.getCode(address_),
+        transactionCount: await web3.eth.getTransactionCount(address_)
+    }
+
+    loadStorage(address_).then().catch(err => console.log(err));
+        // prisma.account.create({data: account}).then(resp => console.log(resp)).catch(errr => console.log(errr))
+
+    // web3.eth.getStorageAt(address_, 0).then(res => {
+    //     if(res != zero){
+    //         console.log("Storage at 0: " + res);
+    //         while(store != zero){
+    //             var i = 0;
+    //             web3.eth.getStorageAt(address_, i).then(res_ => { 
+    //                 store = res;
+    //                 console.log("Storage at " + i + ": ", store);
+    //                 i++;
+    //             }).catch(errr => console.log(err));
+    //             ;
+    //         }
+    //     }
+
+    // }).catch(err => console.log(err));
+}
+
+async function loadStorage(account){
+    var storage = [];
+    var zero = "0x0000000000000000000000000000000000000000000000000000000000000000";
+    var store = 0;
+
+    index = 0
+    while(store != zero){
+        store = await web3.eth.getStorageAt(account, index)
+        if(store != zero){
+            storage[i] = store;
+            console.log("Account: " + account + "Storage: " + store);
+        }
+        index++;
+    }
+    return storage;
+}
+
+function func(req, res){
+    web3.eth.getStorageAt("0x6761BcAF2b2156C058634D9772F07374D6eDeF1d", 0).then(res => { 
+        console.log("Storage: " + res);
+    }).catch(errr => console.log(err));
+    res.send("done");
+
+
+}
 function deleteAll(req, res){
     prisma.block.deleteMany({}).then(res_ => res.send(res_)).catch(err => console.log(err))
 }
 
-module.exports = { createRange, deleteAll };
+module.exports = { func, createRange, deleteAll };
