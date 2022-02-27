@@ -15,6 +15,20 @@ function createRange(req, res){
 
 }
 
+function fetchRange(req, res){
+    console.log(req.body)
+    getBlocks(req.body.start, req.body.end).then(res_ => res.json(res_)).catch(err => res.json(err))
+    console.log("Fetching range");
+}
+
+async function getBlocks(start, end){
+    var blocks = [];
+    for(var i = start; i <= end; i++){
+            blocks.push(await web3.eth.getBlock(i))
+    }
+    return blocks;
+}
+
 function loadTransactions(transactions){
 
     for(var i = 0; i <= transactions.length -1; i++){
@@ -118,4 +132,4 @@ function deleteAll(req, res){
     prisma.block.deleteMany({}).then(res_ => res.send(res_)).catch(err => console.log(err))
 }
 
-module.exports = { func, createRange, deleteAll };
+module.exports = { func, createRange, deleteAll, fetchRange };
